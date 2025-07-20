@@ -22,6 +22,8 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "delay.h"
+#include "iwdg.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -184,11 +186,19 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-
+  static uint16_t three_hundred_cnt = 0;
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+  dbh_DecTick(); // For dbh_DelayMS() function
+  dbh_IncTimestampInMS(); // For timestamp
+  
+  three_hundred_cnt++;
+  if (three_hundred_cnt >= 300) // 300ms counter for IWDG
+  {
+    HAL_IWDG_Refresh(&hiwdg);
+    three_hundred_cnt = 0;
+  }
   /* USER CODE END SysTick_IRQn 1 */
 }
 
